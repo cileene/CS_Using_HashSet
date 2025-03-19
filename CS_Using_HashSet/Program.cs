@@ -1,4 +1,7 @@
-﻿using System;
+﻿// by Nick Lee Jerlung, 2025
+// using https://www.dotnetcurry.com/csharp/1362/hashset-csharp-with-examples
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +10,7 @@ namespace CS_Using_HashSet
 {
     class Program
     {
+        // The included dataset
         static string[] _names = new string[]
         {
             "Tejas", "Mahesh", "Ramesh", "Ram", "GundaRam", "Sabnis", "Leena",
@@ -123,19 +127,25 @@ namespace CS_Using_HashSet
             "Leena", "Neema", "Sita"
         };
         
+        // No way I'm gonna look up a dataset of 500 unique strings
         static string[] _uniqueNames = Enumerable.Range(1, 500).Select(i => $"Name{i}").ToArray();
 
         static void Main(string[] args)
         {
+            // Check the length of the included _names dataset
+            Console.WriteLine($"_names Length: {_names.Length}"); // = 576
+            
             // Check the length of our _uniqueNames array
-            Console.WriteLine(_uniqueNames.Length);
+            Console.WriteLine($"_uniqueNames Length: {_uniqueNames.Length}"); // = 500
             
-            // Print content of _uniqueNames
-            foreach (var name in _uniqueNames)
-            {
-                Console.WriteLine(name);
-            }
+            Console.WriteLine();
             
+            // Uncomment to print content of _uniqueNames
+            // foreach (var name in _uniqueNames)
+            // {
+            //     Console.WriteLine(name);
+            // }
+            //
             
             
             // Section 2: Eliminating Duplicates in C# HashSet --------------------------------------------------------
@@ -280,9 +290,9 @@ namespace CS_Using_HashSet
             Console.WriteLine("____________________________________");
             Console.WriteLine("List Performance while Adding Item");
             Console.WriteLine();
-            List<string> lstNames = new List<string>();
+            List<string> lstNames = new List<string>(_names);
             var s2 = Stopwatch.StartNew();
-            foreach (string s in _uniqueNames)
+            foreach (string s in _names)
             {
                 lstNames.Add(s);
             }
@@ -296,9 +306,9 @@ namespace CS_Using_HashSet
             Console.WriteLine("HashSet Performance while Adding Item");
             Console.WriteLine();
 
-            HashSet<string> hStringNames = new HashSet<string>(StringComparer.Ordinal);
+            HashSet<string> hStringNames = new HashSet<string>(_names, StringComparer.Ordinal);
             var s1 = Stopwatch.StartNew();
-            foreach (string s in _uniqueNames)
+            foreach (string s in _names)
             {
                 hStringNames.Add(s);
             }
@@ -364,9 +374,9 @@ namespace CS_Using_HashSet
             Console.WriteLine("____________________________________");
             Console.WriteLine("List Performance while checking Contains operation");
             Console.WriteLine();
-            List<string> lstNames = new List<string>();
+            List<string> lstNames = new List<string>(_names);
             var s2 = Stopwatch.StartNew();
-            foreach (string s in _uniqueNames)
+            foreach (string s in _names)
             {
                 lstNames.Contains(s);
             }
@@ -380,9 +390,9 @@ namespace CS_Using_HashSet
             Console.WriteLine("HashSet Performance while checking Contains operation");
             Console.WriteLine();
 
-            HashSet<string> hStringNames = new HashSet<string>(StringComparer.Ordinal);
+            HashSet<string> hStringNames = new HashSet<string>(_names, StringComparer.Ordinal);
             var s1 = Stopwatch.StartNew();
-            foreach (string s in _uniqueNames)
+            foreach (string s in _names)
             {
                 hStringNames.Contains(s);
             }
@@ -399,29 +409,52 @@ namespace CS_Using_HashSet
         /*  ____________________________________
             List Performance while checking Contains operation
 
-            0,002 ms
+            0,001 ms
 
             Ends Here
 
             ____________________________________
             HashSet Performance while checking Contains operation
 
-            0,004 ms
+            0,003 ms
+
+            Ends Here
+            ____________________________________
+            */
+        
+        // But hashsets are supposed to be faster?
+        // It's the same behaviour using _names or _uniqueNames.
+        
+        // Alright, after consulting with professor o3-mini-high
+        // it seems the problem was that we needed to prepopulate the collections
+        // by passing the _names array to the constructor of the list/hashset.
+        // This is not present in the example code, nor explained, but doing this fixed all of our problems.
+        // And now the hashset is faster than the list as expected with both datasets.
+        
+        // This prints:
+        /*  ____________________________________
+            List Performance while checking Contains operation
+
+            0,030 ms
+
+            Ends Here
+
+            ____________________________________
+            HashSet Performance while checking Contains operation
+
+            0,012 ms
 
             Ends Here
             ____________________________________
             */
         
 
-
-
-
         static void Get_Remove_Performance_HashSet_vs_List()
         {
             Console.WriteLine("____________________________________");
             Console.WriteLine("List Performance while performing Remove item operation");
             Console.WriteLine();
-            List<string> lstNames = new List<string>();
+            List<string> lstNames = new List<string>(_names);
             var s2 = Stopwatch.StartNew();
             foreach (string s in _names)
             {
@@ -437,7 +470,7 @@ namespace CS_Using_HashSet
             Console.WriteLine("HashSet Performance while performing Remove item operation");
             Console.WriteLine();
 
-            HashSet<string> hStringNames = new HashSet<string>(StringComparer.Ordinal);
+            HashSet<string> hStringNames = new HashSet<string>(_names, StringComparer.Ordinal);
             var s1 = Stopwatch.StartNew();
             foreach (string s in _names)
             {
@@ -451,5 +484,24 @@ namespace CS_Using_HashSet
             Console.WriteLine("____________________________________");
             Console.WriteLine();
         }
+        
+        // This prints:
+        /*  ____________________________________
+            List Performance while performing Remove item operation
+
+            0,044 ms
+
+            Ends Here
+
+            ____________________________________
+            HashSet Performance while performing Remove item operation
+
+            0,004 ms
+
+            Ends Here
+            ____________________________________
+            */
+        // And as expected, hashsets are faster than lists when removing items.
+
     }
 }
